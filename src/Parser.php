@@ -155,21 +155,6 @@ class Parser
     }
 
     /**
-     * Parse the Message into parts
-     *
-     * @return void
-     */
-    protected function parse()
-    {
-        $structure = mailparse_msg_get_structure($this->resource);
-        $this->parts = [];
-        foreach ($structure as $part_id) {
-            $part = mailparse_msg_get_part($this->resource, $part_id);
-            $this->parts[$part_id] = mailparse_msg_get_part_data($part);
-        }
-    }
-
-    /**
      * Retrieve a specific Email Header, without charset conversion.
      *
      * @param string $name Header name
@@ -285,27 +270,6 @@ class Parser
     }
 
     /**
-     * Returns the embedded data structure
-     *
-     * @param string $contentId Content-Id
-     *
-     * @return string
-     */
-    protected function getEmbeddedData($contentId)
-    {
-        $embeddedData = 'data:';
-        foreach ($this->parts as $part) {
-            if ($this->getPart('content-id', $part) == $contentId) {
-                $embeddedData .= $this->getPart('content-type', $part);
-                $embeddedData .= ';'.$this->getPart('transfer-encoding', $part);
-                $embeddedData .= ','.$this->getPartBody($part);
-            }
-        }
-
-        return $embeddedData;
-    }
-
-    /**
      * Return an array with the following keys display, address, is_group
      *
      * @param string $name Header name
@@ -407,6 +371,42 @@ class Parser
         }
 
         return $attachments_paths;
+    }
+
+    /**
+     * Parse the Message into parts
+     *
+     * @return void
+     */
+    protected function parse()
+    {
+        $structure = mailparse_msg_get_structure($this->resource);
+        $this->parts = [];
+        foreach ($structure as $part_id) {
+            $part = mailparse_msg_get_part($this->resource, $part_id);
+            $this->parts[$part_id] = mailparse_msg_get_part_data($part);
+        }
+    }
+
+    /**
+     * Returns the embedded data structure
+     *
+     * @param string $contentId Content-Id
+     *
+     * @return string
+     */
+    protected function getEmbeddedData($contentId)
+    {
+        $embeddedData = 'data:';
+        foreach ($this->parts as $part) {
+            if ($this->getPart('content-id', $part) == $contentId) {
+                $embeddedData .= $this->getPart('content-type', $part);
+                $embeddedData .= ';'.$this->getPart('transfer-encoding', $part);
+                $embeddedData .= ','.$this->getPartBody($part);
+            }
+        }
+
+        return $embeddedData;
     }
 
     /**
