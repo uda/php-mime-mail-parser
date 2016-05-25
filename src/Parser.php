@@ -283,6 +283,32 @@ class Parser
         return mailparse_rfc822_parse_addresses($value);
     }
 
+    public function getParts()
+    {
+        return $this->parts;
+    }
+
+    /**
+     * Retrieve a specified MIME part
+     *
+     * @param string $type
+     * @param array  $parts
+     *
+     * @return string|array
+     */
+    public function getPart($type, $parts = null)
+    {
+        if ($parts === null) {
+            $actualParts = $this->parts;
+        } elseif (!is_array($parts)) {
+            $actualParts = isset($this->parts[$parts]) ? $this->parts[$parts] : [];
+        } else {
+            $actualParts = $parts;
+        }
+
+        return (isset($actualParts[$type])) ? $actualParts[$type] : false;
+    }
+
     /**
      * Returns the attachments contents in order of appearance
      *
@@ -544,19 +570,6 @@ class Parser
         } else {
             return false;
         }
-    }
-
-    /**
-     * Retrieve a specified MIME part
-     *
-     * @param string $type
-     * @param array  $parts
-     *
-     * @return string|array
-     */
-    protected function getPart($type, $parts)
-    {
-        return (isset($parts[$type])) ? $parts[$type] : false;
     }
 
     /**
